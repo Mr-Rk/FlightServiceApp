@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.rk.flightservice.dao.FlightServiceDAO;
 import com.rk.flightservice.entity.FlightDetailsDTO;
 import com.rk.flightservice.entity.FlightScheduleDTO;
+import com.rk.flightservice.exception.InValidTraveDateException;
 
 @Service
 public class FlightServiceImpl implements FlightService {
@@ -23,10 +24,13 @@ public class FlightServiceImpl implements FlightService {
 		super();
 		this.flightServiceDAO = flightServiceDAO;
 	}
+    
 
 	@Override
 	public List<FlightDetailsDTO> serachFlightsBasedonSourceDestAndDate(String sourceAirPort,
 			String destniationAirPort, LocalDate scheduledDate) {
+		
+		checkTravelDate(scheduledDate);
 		
 		List<FlightDetailsDTO> listOfFlights=new ArrayList();;
 		
@@ -64,6 +68,12 @@ public class FlightServiceImpl implements FlightService {
 		scheduleDTO.setScheduledFlight(flightDetailsDTO);
 		
 		flightServiceDAO.save(scheduleDTO);
+	}
+	
+	public void checkTravelDate(LocalDate travelDate) {
+		if(travelDate.isBefore(LocalDate.now())) {
+			throw new InValidTraveDateException("TravelDate should not be past!"); 
+		}
 	}
 	
 
